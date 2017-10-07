@@ -8,6 +8,6 @@ class TestConfParser extends FlatSpec with Matchers{
     val confParser = new ConfParser()
     val conf = confParser.parse("PATH=aaaa\nINTERVAL_MINUTES=1")
     conf.interval shouldEqual 1 * 60 * 1000 * 1000
-    conf.path shouldEqual "aaaa"
+    assert(conf.path.endsWith("/aaaa"))
   }
 }
