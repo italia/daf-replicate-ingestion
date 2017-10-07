@@ -1,8 +1,10 @@
 package it.gov.daf.km4city.avro;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import org.apache.avro.Schema;
+import org.apache.avro.file.FileReader;
 import org.apache.avro.generic.GenericRecord;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,12 +17,14 @@ public class JsonToAvroTest {
     private Schema simpleSchema;
     private Schema structuredSchema;
     private Schema arraySchema;
+    private Schema dataSchema;
 
     @Before
     public void setUp() throws IOException {
         simpleSchema = new Schema.Parser().parse(JsonToAvroTest.class.getClassLoader().getResourceAsStream("simple.json"));
         structuredSchema = new Schema.Parser().parse(JsonToAvroTest.class.getClassLoader().getResourceAsStream("structured.json"));
         arraySchema = new Schema.Parser().parse(JsonToAvroTest.class.getClassLoader().getResourceAsStream("array.json"));
+        dataSchema = new Schema.Parser().parse(JsonToAvroTest.class.getClassLoader().getResourceAsStream("SimpleSchema.avsc"));
     }
 
     @Test
@@ -48,4 +52,21 @@ public class JsonToAvroTest {
                 + "[ { \"color\": \"red\", \"size\": 32 }, { \"color\": \"blue\", \"size\": 34 } ] }"));
     }
 
+    @Test
+    public void verifyCorrectDataExample() {
+        GenericRecord output = JsonToAvro.parse(dataSchema, new StringReader("{\n" +
+                "        \"geometry\":{\"type\": \"Point\",\"coordinates\":[11.2498,43.7751]},\n" +
+                "        \"type\": \"Feature\",\n" +
+                "        \"properties\": {\n" +
+                "          \"name\": \"FI055ZTL00101\",\n" +
+                "          \"tipo\": \"sensore\",\n" +
+                "          \"typeLabel\": \"Sensore\",\n" +
+                "          \"serviceType\": \"TransferServiceAndRenting_SensorSite\",\n" +
+                "          \"serviceUri\": \"http://www.disit.org/km4city/resource/FI055ZTL00101\",\n" +
+                "          \"distance\": \"0.12235762438738436\",\n" +
+                "          \"photoThumbs\": []\n" +
+                "        },\n" +
+                "        \"id\": 1\n" +
+                "      }"));
+    }
 }

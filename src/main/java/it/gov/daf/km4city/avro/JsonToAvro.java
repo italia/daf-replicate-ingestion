@@ -116,7 +116,7 @@ public class JsonToAvro {
                         .orElseThrow(() -> new ConversionException("Current schema type cannot be converted to any of " + lTypes));
             default:
                 if (!lTypes.contains(schema.getType())) {
-                    throw new ConversionException("Current schema type cannot be converted to any of " + lTypes);
+                    throw new ConversionException("Current schema " + schema.getName() + " type cannot be converted to any of " + lTypes);
                 }
                 return schema;
         }
