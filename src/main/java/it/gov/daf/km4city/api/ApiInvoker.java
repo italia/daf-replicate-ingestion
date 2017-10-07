@@ -1,4 +1,4 @@
-package it.gov.daf.km4city;
+package it.gov.daf.km4city.api;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -15,7 +15,7 @@ public class ApiInvoker {
     public static final Logger logger = LoggerFactory.getLogger(ApiInvoker.class);
     private final DefaultHttpClient httpClient;
 
-    ApiInvoker() {
+    public ApiInvoker() {
         httpClient = new DefaultHttpClient();
     }
 
