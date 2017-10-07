@@ -14,7 +14,7 @@ public class KafkaSend implements Runnable {
 
     private static final Logger logger = LoggerFactory.getLogger(KafkaSend.class);
 
-    private static final String TOPIC = "MarketOrders";
+    private static final String TOPIC = "OUTPUT_TOPIC";
     private AtomicBoolean isExiting = new AtomicBoolean(false);
 
     /**
