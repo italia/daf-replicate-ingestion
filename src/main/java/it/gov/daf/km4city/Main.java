@@ -17,6 +17,7 @@ public class Main {
         try {
             List<JSONObject> result = apiLocation.getLocationRecords(43.7741,11.2453,43.7768,11.2515);
             logger.info("result {}",result);
+
         } catch (Exception e) {
             logger.error("error",e);
         }

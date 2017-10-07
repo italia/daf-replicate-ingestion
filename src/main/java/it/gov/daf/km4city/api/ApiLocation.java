@@ -11,12 +11,11 @@ import java.util.List;
 
 public class ApiLocation extends ApiInvoker {
 
-    private static final String url="http://servicemap.disit.org/WebAppGrafo/api/v1/?selection=";
+    private static final String url = "http://servicemap.disit.org/WebAppGrafo/api/v1/?selection=";
     private static final String params = "&categories=SensorSite;Car_park&lang=it&format=json";
     private final JSONParser parser = new JSONParser();
 
     /**
-     *
      * @param c1 lat 1
      * @param c2 long 1
      * @param c3 lat 2
@@ -24,7 +23,7 @@ public class ApiLocation extends ApiInvoker {
      * @return the full json of the respose
      * @throws IOException
      */
-    public String getLocation(double c1,double c2, double c3, double c4) throws IOException {
+    public String getLocation(double c1, double c2, double c3, double c4) throws IOException {
         StringBuilder request = new StringBuilder();
         request.append(url)
                 .append(c1)
@@ -41,9 +40,16 @@ public class ApiLocation extends ApiInvoker {
     public List<JSONObject> getLocationRecords(double c1, double c2, double c3, double c4) throws IOException, ParseException {
         List<JSONObject> result = new ArrayList<>();
         JSONObject json = (JSONObject) parser.parse(getLocation(c1, c2, c3, c4));
-        JSONObject features = (JSONObject)json.get("SensorSites");
-        JSONArray records = (JSONArray) features.get("features");
-        result.addAll(records);
+        JSONObject features = (JSONObject) json.get("SensorSites");
+        if (features !=null) {
+            JSONArray records = (JSONArray) features.get("features");
+            result.addAll(records);
+        }
+       features= (JSONObject) json.get("Services");
+        if (features !=null) {
+            JSONArray records = (JSONArray) features.get("features");
+            result.addAll(records);
+        }
         return result;
     }
 }
