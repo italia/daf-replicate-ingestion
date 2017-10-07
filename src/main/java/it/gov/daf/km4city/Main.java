@@ -21,7 +21,7 @@ public class Main {
         //just a little test
         ApiLocation apiLocation = new ApiLocation();
         try {
-            List<JSONObject> result = apiLocation.getLocationRecords(43.7741,11.2453,43.7768,11.2515);
+            List<JSONObject> result = apiLocation.getLocationRecords(43.743817,11.176357,43.812729,11.304588);
             List<JSONObject> events = result.stream().map(
                     item -> {
                         ApiEvent event = new ApiEvent();
