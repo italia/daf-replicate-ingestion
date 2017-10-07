@@ -3,7 +3,7 @@ package api_calls
 trait Query {
 
   val format: String = "json"
-  val baseUrl : String = "http://servicemap.km4city.org/WebAppGrafo/"
+  val baseUrl : String = "http://servicemap.disit.org/WebAppGrafo/api/v1/?"
   val serviceUri: String
 
 }
