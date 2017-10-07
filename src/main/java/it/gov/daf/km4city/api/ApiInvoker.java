@@ -1,8 +1,12 @@
 package it.gov.daf.km4city.api;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.json.simple.parser.JSONParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +22,11 @@ public class ApiInvoker {
     protected final JSONParser parser = new JSONParser();
 
     public ApiInvoker() {
-        httpClient = new DefaultHttpClient();
+        // set the connection timeout value to 30 seconds (30000 milliseconds)
+        final HttpParams httpParams = new BasicHttpParams();
+        HttpConnectionParams.setConnectionTimeout(httpParams, 5000);
+        HttpConnectionParams.setSoTimeout(httpParams,5000);
+        httpClient = new DefaultHttpClient(httpParams);
     }
 
     public void close() {
@@ -30,6 +38,7 @@ public class ApiInvoker {
         HttpGet getRequest = new HttpGet(request);
         getRequest.addHeader("accept", "application/json");
 
+        logger.info("calling {}",request);
         HttpResponse response = httpClient.execute(getRequest);
 
         if (response.getStatusLine().getStatusCode() != 200) {
