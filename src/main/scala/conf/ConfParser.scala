@@ -6,8 +6,7 @@ class ConfParser {
     val lines = text.split("\n").map(formatLine)
     val path = lines.filter(pair => pair(0) == "PATH")(0)(1)
     val interval = lines
-                    .map(array => Pair[String, String](array(0), array(1)))
-                    .map(pair => translateIntervals(pair._1, pair._2)).sum
+                    .map(pair => translateIntervals(pair(0), pair(1))).sum
     return new Conf(interval, path)
 
   }
