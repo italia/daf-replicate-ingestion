@@ -38,11 +38,12 @@ public class ApiInvoker {
 
         BufferedReader br = new BufferedReader(
                 new InputStreamReader((response.getEntity().getContent())));
-        String output;
-        while ((output = br.readLine()) != null) {
-            System.out.println(output);
+        String tmp;
+        StringBuilder output = new StringBuilder();
+        while ((tmp = br.readLine()) != null) {
+            output.append(tmp);
         }
-        return output;
+        return output.toString();
     }
 
 

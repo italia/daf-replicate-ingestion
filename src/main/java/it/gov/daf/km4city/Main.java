@@ -9,14 +9,14 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
 
-        ApiInvoker apiInvoker = new ApiInvoker();
+        ApiLocation apiLocation = new ApiLocation();
         try {
-             apiInvoker.invoke("http://servicemap.disit.org/WebAppGrafo/api/v1/?selection=43.7741;11.2453;43.7768;11.2515&categories=SensorSite;Car_park&lang=it&format=json");
+            apiLocation.getLocation(43.7741,11.2453,43.7768,11.2515);
         } catch (Exception e) {
             logger.error("error",e);
         }
         finally {
-            apiInvoker.close();
+            apiLocation.close();
         }
 
 
