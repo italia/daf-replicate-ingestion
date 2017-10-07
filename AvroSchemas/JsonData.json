@@ -1,0 +1,67 @@
+{
+  "SensorSites": {
+    "fullCount": 3,
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "geometry":{"type": "Point","coordinates":[11.2498,43.7751]},
+        "type": "Feature",
+        "properties": {
+          "name": "FI055ZTL00101",
+          "tipo": "sensore",
+          "typeLabel": "Sensore",
+          "serviceType": "TransferServiceAndRenting_SensorSite",
+          "serviceUri": "http://www.disit.org/km4city/resource/FI055ZTL00101",
+          "distance": "0.12235762438738436",
+          "photoThumbs": []
+        },
+        "id": 1
+      },
+      {
+        "geometry":{"type": "Point","coordinates":[11.25,43.7747]},
+        "type": "Feature",
+        "properties": {
+          "name": "FI055ZTL01601",
+          "tipo": "sensore",
+          "typeLabel": "Sensore",
+          "serviceType": "TransferServiceAndRenting_SensorSite",
+          "serviceUri": "http://www.disit.org/km4city/resource/FI055ZTL01601",
+          "distance": "0.15514777423870244",
+          "photoThumbs": []
+        },
+        "id": 2
+      },
+      {
+        "geometry":{"type": "Point","coordinates":[11.2464,43.7749]},
+        "type": "Feature",
+        "properties": {
+          "name": "FI055ZTL00801",
+          "tipo": "sensore",
+          "typeLabel": "Sensore",
+          "serviceType": "TransferServiceAndRenting_SensorSite",
+          "serviceUri": "http://www.disit.org/km4city/resource/FI055ZTL00801",
+          "distance": "0.16994954336055926",
+          "photoThumbs": []
+        },
+        "id": 3
+      }]}
+, "Services":{
+  "fullCount": 1,
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "geometry": {"type": "Point","coordinates":[11.2495002746582,43.77590179443359]},
+      "type": "Feature",
+      "properties": {
+        "name": "Garage La Stazione Spa",
+        "tipo": "Parcheggio_auto",
+        "typeLabel": "Parcheggio auto",
+        "serviceType": "TransferServiceAndRenting_Car_park",
+        "distance": "0.0977",
+        "serviceUri": "http://www.disit.org/km4city/resource/RT04801702315PO",
+        "photoThumbs": [],
+        "multimedia": ""
+      },
+      "id": 1
+    }]}
+}
