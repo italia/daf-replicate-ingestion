@@ -1,17 +1,18 @@
 package it.gov.daf.km4city.avro;
 
+import org.apache.avro.Schema;
+import org.apache.avro.generic.GenericRecord;
+import org.apache.avro.generic.GenericRecordBuilder;
+
+import javax.json.Json;
+import javax.json.JsonException;
+import javax.json.stream.JsonParser;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import javax.json.Json;
-import javax.json.JsonException;
-import javax.json.stream.JsonParser;
-import org.apache.avro.Schema;
-import org.apache.avro.generic.GenericRecord;
-import org.apache.avro.generic.GenericRecordBuilder;
 
 /**
  * This class provides methods to convert JSON data to an Avro record.
