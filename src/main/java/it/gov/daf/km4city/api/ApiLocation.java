@@ -13,7 +13,6 @@ public class ApiLocation extends ApiInvoker {
 
     private static final String url = "http://servicemap.disit.org/WebAppGrafo/api/v1/?selection=";
     private static final String params = "&categories=SensorSite;Car_park&lang=it&format=json";
-    private final JSONParser parser = new JSONParser();
 
     /**
      * @param c1 lat 1

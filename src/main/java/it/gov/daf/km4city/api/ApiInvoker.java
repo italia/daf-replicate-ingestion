@@ -3,6 +3,7 @@ package it.gov.daf.km4city.api;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.simple.parser.JSONParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,6 +15,7 @@ public class ApiInvoker {
 
     public static final Logger logger = LoggerFactory.getLogger(ApiInvoker.class);
     private final DefaultHttpClient httpClient;
+    protected final JSONParser parser = new JSONParser();
 
     public ApiInvoker() {
         httpClient = new DefaultHttpClient();
