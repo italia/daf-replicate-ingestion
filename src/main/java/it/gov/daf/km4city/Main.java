@@ -2,6 +2,9 @@ package it.gov.daf.km4city;
 
 import it.gov.daf.km4city.api.ApiEvent;
 import it.gov.daf.km4city.api.ApiLocation;
+import it.gov.daf.km4city.converter.UtilConverter;
+import it.gov.daf.km4city.producer.KafkaSend;
+import it.teamDigitale.avro.Event;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
@@ -20,8 +23,22 @@ public class Main {
 
         //just a little test
         ApiLocation apiLocation = new ApiLocation();
+        KafkaSend sender = new KafkaSend();
+
         try {
             List<JSONObject> result = apiLocation.getLocationRecords(43.743817,11.176357,43.812729,11.304588);
+
+
+            logger.info("result {}",result);
+            result.forEach(
+                    item -> {
+                        Event e = new Event();
+                        UtilConverter.convertLocation(item,e);
+                        sender.getQueue().add(e);
+                    }
+            );
+
+
             List<JSONObject> events = result.stream().map(
                     item -> {
                         ApiEvent event = new ApiEvent();
@@ -38,7 +55,7 @@ public class Main {
                     }
             ).collect(Collectors.toList());
 
-            logger.info("result {}",result);
+
             logger.info("events {}",events);
 
         } catch (Exception e) {
@@ -46,6 +63,7 @@ public class Main {
         }
         finally {
             apiLocation.close();
+            sender.stop();
         }
 
 

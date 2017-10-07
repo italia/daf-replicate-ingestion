@@ -3,12 +3,16 @@ package it.gov.daf.km4city.producer;
 import it.teamDigitale.avro.Event;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class KafkaSend implements Runnable {
@@ -17,6 +21,11 @@ public class KafkaSend implements Runnable {
 
     private static final String TOPIC = "OUTPUT_TOPIC";
     private AtomicBoolean isExiting = new AtomicBoolean(false);
+    private final BlockingQueue queue = new ArrayBlockingQueue(1024);
+
+    public BlockingQueue getQueue() {
+        return queue;
+    }
 
     /**
      * read the config file
@@ -52,10 +61,8 @@ public class KafkaSend implements Runnable {
         KafkaProducer<String, Event> producer = null;
         try {
             producer = new KafkaProducer<>(setup());
-
             while (!isExiting.get()) {
-                Event event = new Event();
-                //TODO call api
+                Event event = (Event) queue.take();
                 logger.debug("sending order {}", event);
                 final ProducerRecord<String, Event> record = new ProducerRecord<>(TOPIC, event);
                 producer.send(record, (metadata, e) -> {
@@ -63,7 +70,6 @@ public class KafkaSend implements Runnable {
                         //error handling
                         logger.error("error while sending ", e);
                     }
-
                 });
             }
         } catch (Exception e) {
