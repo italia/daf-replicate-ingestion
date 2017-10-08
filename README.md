@@ -2,5 +2,5 @@
 
 Microservices that ingest data from Replicate and push it into DAF
 
-- [[km4city-to-kafka]]
+- [Km4City to Kafka](km4city-to-kafka.md)
 
