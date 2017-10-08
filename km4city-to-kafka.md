@@ -8,7 +8,7 @@ that ingests data coming from Replicate's platform into DAF.
 By default, the input data is accessed from Km4City's REST API
 endpoint at http://servicemap.disit.org/WebAppGrafo/api/v1/ and
 written to a Kafka topic named `km4city` on `localhost:9092` (see
-[[Configuration]] below).
+[Configuration](#Configuration) below).
 
 ## Technologies
 
