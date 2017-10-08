@@ -15,6 +15,12 @@ import java.util.List;
 
 public class Main {
 
+    //florence area, todo configuration, not hardcoded
+    private static double lat1=43.743817;
+    private static double long1=11.176357;
+    private static double lat2=43.812729;
+    private static double long2=11.304588;
+
     public static final Logger logger = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) throws Exception {
@@ -36,7 +42,7 @@ public class Main {
 
         try {
             //prende i sensori di firenze, TODO fare configurazione!
-            List<JSONObject> result = apiLocation.getLocationRecords(43.743817,11.176357,43.812729,11.304588);
+            List<JSONObject> result = apiLocation.getLocationRecords(lat1,long1,lat2,long2);
             logger.info("result {}",result);
             //pubblica info sui sensori
             result.forEach(
