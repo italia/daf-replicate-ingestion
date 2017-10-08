@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: it.teamDigitale.dafreplicateingestion.km4cityclient.Km4CityServiceApiTest
--------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.451 sec - in it.teamDigitale.dafreplicateingestion.km4cityclient.Km4CityServiceApiTest
