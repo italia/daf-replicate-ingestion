@@ -1,17 +1,35 @@
 package conf
 
+import java.lang.IndexOutOfBoundsException
+
 class ConfParser {
 
   def parse(text: String): Conf = {
-    val lines = text.split("\n").filter(p => p.startsWith("#")).map(formatLine)
-    val path = lines.filter(pair => pair(0) == "PATH")(0)(1)
+    val lines = text.split("\n").filterNot(p => p.startsWith("#")).map(formatLine)
+    val path = getValue(lines, "PATH")
     val interval = lines
                     .map(pair => translateIntervals(pair(0), pair(1))).sum
-    return new Conf(interval, path)
+    val latitude = getValue(lines, "LATITUDE").toInt
+    val longitude = getValue(lines, "LONGITUDE").toInt
+    val conf = new Conf(interval, path, latitude, longitude)
+    try {
+      val maxDists = getValue(lines, "MAXDISTS").toInt
+      conf.maxDists = maxDists
+    } catch{
+      case e: ArrayIndexOutOfBoundsException => _
+    }
+    try {
+      val maxResults = getValue(lines, "MAXRESULTS").toInt
+      conf.maxResults = maxResults
+    } catch{
+      case e: ArrayIndexOutOfBoundsException => _
+    }
 
+    return conf
   }
 
-
+  def getValue(lines: Array[Array[String]], name: String):  String =
+    lines.filter(pair => pair(0) == name)(0)(1)
 
   def translateIntervals(typeInverval: String, value: String) : Int =
     typeInverval match{
