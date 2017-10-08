@@ -34,7 +34,7 @@ public class ParkingConverterImplTest {
 	}
 	
 	@Test
-	public void testParkingConverterJSONOjectToEvent() throws Exception {
+	public void testParkingConverterJSONObjectToEvent() throws Exception {
 		Event event = parkingConverter.convertToEvent(jsonObject);
 		assertEquals("11.2495-43.7759", event.getLocation());
 		assertEquals("http://www.disit.org/km4city/resource/RT04801702315PO", event.getService());
