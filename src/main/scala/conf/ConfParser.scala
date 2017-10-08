@@ -16,13 +16,13 @@ class ConfParser {
       val maxDists = getValue(lines, "MAXDISTS").toInt
       conf.maxDists = maxDists
     } catch{
-      case e: ArrayIndexOutOfBoundsException => _
+      case e: ArrayIndexOutOfBoundsException =>
     }
     try {
       val maxResults = getValue(lines, "MAXRESULTS").toInt
       conf.maxResults = maxResults
     } catch{
-      case e: ArrayIndexOutOfBoundsException => _
+      case e: ArrayIndexOutOfBoundsException =>
     }
 
     return conf
