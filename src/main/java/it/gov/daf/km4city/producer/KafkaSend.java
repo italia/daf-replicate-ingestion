@@ -3,7 +3,6 @@ package it.gov.daf.km4city.producer;
 import it.teamDigitale.avro.Event;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.clients.producer.RecordMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,7 +11,6 @@ import java.io.InputStream;
 import java.util.Properties;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class KafkaSend implements Runnable {
@@ -57,13 +55,12 @@ public class KafkaSend implements Runnable {
      */
     @Override
     public void run() {
-
         KafkaProducer<String, Event> producer = null;
         try {
             producer = new KafkaProducer<>(setup());
             while (!isExiting.get()) {
                 Event event = (Event) queue.take();
-                logger.debug("sending order {}", event);
+                logger.info("sending event {}", event);
                 final ProducerRecord<String, Event> record = new ProducerRecord<>(TOPIC, event);
                 producer.send(record, (metadata, e) -> {
                     if (e != null) {

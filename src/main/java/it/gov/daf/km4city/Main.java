@@ -6,11 +6,9 @@ import it.gov.daf.km4city.converter.UtilConverter;
 import it.gov.daf.km4city.producer.KafkaSend;
 import it.teamDigitale.avro.Event;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,11 +23,15 @@ public class Main {
         ApiLocation apiLocation = new ApiLocation();
         KafkaSend sender = new KafkaSend();
 
+        //starting kafka producer
+        Thread threadSender = new Thread(sender);
+        threadSender.start();
+
         try {
+            //prende i sensori di firenze
             List<JSONObject> result = apiLocation.getLocationRecords(43.743817,11.176357,43.812729,11.304588);
-
-
             logger.info("result {}",result);
+            //pubblica info sui sensori
             result.forEach(
                     item -> {
                         Event e = new Event();
@@ -38,25 +40,28 @@ public class Main {
                     }
             );
 
-
-            List<JSONObject> events = result.stream().map(
-                    item -> {
-                        ApiEvent event = new ApiEvent();
-                        try {
-                            return event.getEventsFromJsonReply(item);
-                        } catch (SocketTimeoutException e) {
-                            logger.warn("service not replying!");
-                        } catch (Exception e) {
-                            logger.error("error", e);
-                        } finally {
-                            event.close();
+            //prende eventi
+            while (true) {
+                result.stream().forEach(
+                        item -> {
+                            ApiEvent event = new ApiEvent();
+                            try {
+                                JSONObject json = event.getEventsFromJsonReply(item);
+                                Event e = new Event();
+                                UtilConverter.convertEvent(json,e);
+                                sender.getQueue().add(e);
+                            } catch (SocketTimeoutException e) {
+                                logger.warn("service not replying!");
+                            } catch (Throwable e) {
+                                logger.error("error", e);
+                            } finally {
+                                event.close();
+                            }
                         }
-                        return null;
-                    }
-            ).collect(Collectors.toList());
+                );
+                Thread.sleep(30000);//polla ogni 30 secondi le info del stato
+            }
 
-
-            logger.info("events {}",events);
 
         } catch (Exception e) {
             logger.error("error",e);
@@ -64,9 +69,8 @@ public class Main {
         finally {
             apiLocation.close();
             sender.stop();
+            threadSender.join();
         }
-
-
     }
 
 }
