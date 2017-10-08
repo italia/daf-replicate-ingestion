@@ -11,13 +11,14 @@ import org.slf4j.LoggerFactory;
 
 import java.net.SocketTimeoutException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Main {
 
     public static final Logger logger = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) throws Exception {
+
+        logger.info("Process Starting...");
 
         //just a little test
         ApiLocation apiLocation = new ApiLocation();
