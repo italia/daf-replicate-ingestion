@@ -1,0 +1,11 @@
+/home/alessandro/Progetti/daf-replicate-ingestion/src/main/java/it/teamDigitale/dafreplicateingestion/converter/ParkingConverterImpl.java
+/home/alessandro/Progetti/daf-replicate-ingestion/src/main/java/it/teamDigitale/dafreplicateingestion/km4cityclient/AbstractKm4CityApiRestClient.java
+/home/alessandro/Progetti/daf-replicate-ingestion/src/main/java/it/teamDigitale/avro/DataPoint.java
+/home/alessandro/Progetti/daf-replicate-ingestion/src/main/java/it/teamDigitale/dafreplicateingestion/converter/Converter.java
+/home/alessandro/Progetti/daf-replicate-ingestion/src/main/java/it/teamDigitale/dafreplicateingestion/serializer/AvroSerializer.java
+/home/alessandro/Progetti/daf-replicate-ingestion/src/main/java/it/teamDigitale/dafreplicateingestion/DafReplicateIngestionApplication.java
+/home/alessandro/Progetti/daf-replicate-ingestion/src/main/java/it/teamDigitale/avro/Event.java
+/home/alessandro/Progetti/daf-replicate-ingestion/src/main/java/it/teamDigitale/dafreplicateingestion/producer/Sender.java
+/home/alessandro/Progetti/daf-replicate-ingestion/src/main/java/it/teamDigitale/dafreplicateingestion/km4cityclient/Km4CityServiceApi.java
+/home/alessandro/Progetti/daf-replicate-ingestion/src/main/java/it/teamDigitale/dafreplicateingestion/km4cityclient/Km4CitySearchServiceApi.java
+/home/alessandro/Progetti/daf-replicate-ingestion/src/main/java/it/teamDigitale/dafreplicateingestion/producer/SenderConfig.java

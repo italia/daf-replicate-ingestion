@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: it.italia.developers.dafreplicateingestion.DafReplicateIngestionApplicationTests
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 7.498 sec - in it.italia.developers.dafreplicateingestion.DafReplicateIngestionApplicationTests
