@@ -12,11 +12,10 @@ Even in this case we decided to adopt this kind of technology to easily permit a
 
 At the moment, data are acquired from the Km4City REST Api returning territorial information system in unstructured Json format (no schema files are provided at the moment). 
 The software queries the service using an active polling protocol and collecting API infos avery N seconds (N is intended as configurable).
-Data are then encapsulated in an Avro message, using the Json data acquired from the aPI as a payload of the message and then pushed the message in a Kafka queue, and then stored in the Elastic Data Warehouse. 
+Data are then encapsulated in an Avro message, using the Json data acquired from the API as a payload of the message and then pushed the message in a Kafka queue, and then stored in the Elastic Data Warehouse. 
 
 At the moment, as mentioned, data json schema information are not provided, so that we could not perform an automatic data forma conversion between json and avro format (natively supported by Kafka). 
-
-Anyway we implemented a generic json to avro transcoder that, given a json data and avro schema files can produce a valid avro file.
+For further development we implemented a generic json to avro transcoder that, given a json data and avro schema files can produce a valid avro file.
 Just having the json schema files could permit us to authomatically generate the avro schema file to be used in the data conversion 
 The Json2Avro transcoder file and test are present in the project, for further developments. 
 
