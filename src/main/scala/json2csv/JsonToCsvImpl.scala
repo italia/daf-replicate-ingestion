@@ -11,15 +11,15 @@ class JsonToCsvImpl extends JsonToCsv{
     * @param json a json parsed from scala.util.parsing.json.JSON
     * @return
     */
+  val fields = List("geometry_type", "geometry_coordinates", "name", "tipo", "typeLabel", "serviceType", "serviceUri", "distance").reduce((a,b) => a + sep + b)
   override def trasform(json: Map[String, _]): String = {
     val busStopsList = json("BusStops").asInstanceOf[Map[String, _]]("features").asInstanceOf[List[Map[String, _]]]
     val sensorsSitesList = json("SensorSites").asInstanceOf[Map[String, _]]("features").asInstanceOf[List[Map[String, _]]]
     val servicesList = json("Services").asInstanceOf[Map[String, _]]("features").asInstanceOf[List[Map[String, _]]]
-    val fields = List("geometry_type", "geometry_coordinates", "name", "tipo", "typeLabel", "serviceType", "serviceUri", "distance").reduce((a,b) => a + sep + b)
+    val timestamp = Calendar.getInstance.getTime.toString
     val queryResultsList = busStopsList ++ sensorsSitesList ++ servicesList
     val csvResults = queryResultsList.map(flatQueryLine)
-    val timestamp = Calendar.getInstance.getTime.toString
-    return (timestamp +: fields +: csvResults).reduce((a,b) => a + "\n" + b)
+    return (timestamp +: csvResults).reduce((a,b) => a + "\n" + b)
   }
 
   def flatQueryLine(line: Map[String, _]) : String = {

@@ -1,5 +1,5 @@
 package api_calls.Point
 
-class GPSPoint(lat: Int, long: Int) extends StartingPoint{
+class GPSPoint(lat: Double, long: Double) extends StartingPoint{
   override val location = s"$lat;$long"
 }

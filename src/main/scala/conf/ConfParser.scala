@@ -9,8 +9,8 @@ class ConfParser {
     val path = getValue(lines, "PATH")
     val interval = lines
                     .map(pair => translateIntervals(pair(0), pair(1))).sum
-    val latitude = getValue(lines, "LATITUDE").toInt
-    val longitude = getValue(lines, "LONGITUDE").toInt
+    val latitude = getValue(lines, "LATITUDE").toDouble
+    val longitude = getValue(lines, "LONGITUDE").toDouble
     val conf = new Conf(interval, path, latitude, longitude)
     try {
       val maxDists = getValue(lines, "MAXDISTS").toInt
