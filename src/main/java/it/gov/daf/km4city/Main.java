@@ -2,6 +2,7 @@ package it.gov.daf.km4city;
 
 import it.gov.daf.km4city.api.ApiEvent;
 import it.gov.daf.km4city.api.ApiLocation;
+import it.gov.daf.km4city.consumer.EventConsumer;
 import it.gov.daf.km4city.converter.UtilConverter;
 import it.gov.daf.km4city.producer.KafkaSend;
 import it.teamDigitale.avro.Event;
@@ -23,13 +24,18 @@ public class Main {
         //just a little test
         ApiLocation apiLocation = new ApiLocation();
         KafkaSend sender = new KafkaSend();
+        EventConsumer receiver = new EventConsumer();
 
         //starting kafka producer
         Thread threadSender = new Thread(sender);
         threadSender.start();
 
+        //starting a local consumer to put data into elastic
+        Thread threadConsumer = new Thread(receiver);
+        threadConsumer.start();
+
         try {
-            //prende i sensori di firenze
+            //prende i sensori di firenze, TODO fare configurazione!
             List<JSONObject> result = apiLocation.getLocationRecords(43.743817,11.176357,43.812729,11.304588);
             logger.info("result {}",result);
             //pubblica info sui sensori
@@ -70,6 +76,8 @@ public class Main {
         finally {
             apiLocation.close();
             sender.stop();
+            receiver.stop();
+            threadConsumer.join();
             threadSender.join();
         }
     }

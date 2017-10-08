@@ -1,6 +1,7 @@
 package it.gov.daf.km4city.consumer;
 
 import it.teamDigitale.avro.Event;
+import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.errors.WakeupException;
@@ -16,12 +17,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * executor that receives avro objects from a kafka topic
+ * thread that receives avro objects from a kafka topic
  */
 public class EventConsumer implements Runnable {
 
@@ -31,9 +34,9 @@ public class EventConsumer implements Runnable {
     private static final long TIMEOUT = 30000;
     private final AtomicBoolean isExiting = new AtomicBoolean(false);
 
-    private KafkaConsumer<String, Event> consumer = null;
+    private KafkaConsumer<String, GenericRecord> consumer = null;
     // on startup
-    TransportClient client;
+    private TransportClient client;
     private long received = 0;
 
     /**
@@ -73,7 +76,7 @@ public class EventConsumer implements Runnable {
 
         try {
             client = new PreBuiltTransportClient(Settings.builder()
-                    .put("cluster.name", "internal_test").build())
+                    .put("cluster.name", "elasticsearch").build())
                     .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("40.115.16.108"), 9300));
         } catch (UnknownHostException e) {
             logger.error("error",e);
@@ -102,20 +105,25 @@ public class EventConsumer implements Runnable {
         }
     }
 
-    private void process(ConsumerRecord<String, Event> event) {
+    private void process(ConsumerRecord<String, GenericRecord> event) {
         logger.debug("received event [{},{}]", event.key(), event.value());
         ++received;
 
-        final String json = event.value().getBody().toString();
-        final String mapping = event.value().getSource().toString();
-        final String index = "iot";
+        try {
+            final ByteBuffer json_byte = (ByteBuffer) event.value().get("body");
+            final String json = new String(json_byte.array());
+            final String mapping = event.value().get("source").toString();
+            final String index = "iot";
 
-        //put in elastic
-        logger.info("indexing mapping {}, source {}",json,mapping);
-        IndexResponse response = client.prepareIndex(index, mapping)
-                .setSource(json)
-                .get();
+            //put in elastic
+            logger.info("indexing mapping {}, source {}", json, mapping);
+            IndexResponse response = client.prepareIndex(index+"_"+mapping, mapping)
+                    .setSource(json)
+                    .get();
 
-        logger.info("index result",response.status());
+            logger.info("index result", response.status());
+        } catch (Exception e) {
+            logger.error("error while receiving...",e);
+        }
     }
 }
