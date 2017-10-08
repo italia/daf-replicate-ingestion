@@ -22,7 +22,7 @@ while True:
     root = ET.fromstring(source2) #"xml.etree.ElementTree" lib for xml
     new_end_time = source2.split('end_time="')[1].split('" source')[0] #get xml time
     i=1 #index to get "flow" and "speed"
-    if end_time != new_end_time: 
+    if end_time != new_end_time:
         with topic.get_sync_producer() as producer:
             for FDT_data in root.findall("{http://www.5t.torino.it/simone/ns/traffic_data}FDT_data"): #get all FDT_data
                 lcd1 = FDT_data.get('lcd1') #get xml data
