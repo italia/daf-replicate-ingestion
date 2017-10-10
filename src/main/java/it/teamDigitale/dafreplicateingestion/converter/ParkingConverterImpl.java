@@ -33,13 +33,14 @@ public class ParkingConverterImpl implements Converter{
 	@Override
 	public Event convertToEvent(JSONObject toBeConverted) {
 		try {
+			System.out.println(toBeConverted.toString());
 			JSONArray coordinates = toBeConverted
 					.getJSONObject("Service")
 					.getJSONArray("features")
 					.getJSONObject(0)
 					.getJSONObject("geometry")
 					.getJSONArray("coordinates");
-			String location = coordinates.getString(0) + "-" + coordinates.getString(1);
+			String location = coordinates.get(0) + "-" + coordinates.get(1);
 			String service = toBeConverted
 					.getJSONObject("Service")
 					.getJSONArray("features")
