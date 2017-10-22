@@ -1,0 +1,29 @@
+{
+   "name" : "location",
+   "type" : "record",
+   "namespace" : "Km4City",
+   "fields" : [
+      { "name" : "id" , "type" : "int" },
+      { "name" : "type", "type" : "string" },
+      { "type" : "record",
+           "namespace" : "Km4City",
+           "name" : "geometry",
+           "fields" : [
+              { "name" : "type" , "type" : "string" },
+              { "name" : "coordinates" , "type" : "array" , "items" : "double" }
+           ]
+      },
+      { "type" : "record",
+        "namespace" : "Km4City",
+        "name" : "properties",
+        "fields" : [
+            { "name" : "tipo" , "type" : "string" },
+            { "name" : "typelabel" , "type" : "string" },
+            { "name" : "serviceType" , "type" : "string" },
+            { "name" : "serviceUri" , "type" : "string" },
+            { "name" : "distance" , "type" : "string" },
+        ]
+      }
+   ]
+}
+

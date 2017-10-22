@@ -1,0 +1,30 @@
+{
+    "name": "GarmentRecord",
+    "type": "record",
+    "fields": [
+        {
+            "name": "description",
+            "type": "string"
+        },
+        {
+            "name": "shapes",
+            "type": {
+                "type": "array",
+                "items": {
+                    "name": "ShapeRecord",
+                    "type": "record",
+                    "fields": [
+                        {
+                            "name": "color",
+                            "type": "string"
+                        },
+                        {
+                            "name": "size",
+                            "type": "int"
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}
