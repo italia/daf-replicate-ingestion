@@ -1,6 +1,8 @@
 package it.gov.daf.km4city.consumer;
 
-import it.teamDigitale.avro.Event;
+import akka.actor.AbstractActor;
+import akka.actor.Terminated;
+import it.gov.daf.km4city.Main;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -18,26 +20,41 @@ import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Properties;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
- * thread that receives avro objects from a kafka topic
+ * actor that receives avro objects from a kafka topic
  */
-public class EventConsumer implements Runnable {
+public class EventConsumer extends AbstractActor {
 
     private static final Logger logger = LoggerFactory.getLogger(EventConsumer.class);
 
     private static final String TOPIC = "OUTPUT_TOPIC";
     private static final long TIMEOUT = 30000;
-    private final AtomicBoolean isExiting = new AtomicBoolean(false);
+
+    public static final class Tick {
+    }
+
 
     private KafkaConsumer<String, GenericRecord> consumer = null;
     // on startup
     private TransportClient client;
     private long received = 0;
+
+    public EventConsumer() throws IOException {
+        try {
+            client = new PreBuiltTransportClient(Settings.builder()
+                    .put("cluster.name", "elasticsearch").build())
+                    .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("127.0.0.1"), 9300));
+        } catch (UnknownHostException e) {
+            logger.error("error",e);
+        }
+
+        consumer = new KafkaConsumer<>(setup());
+        consumer.subscribe(Collections.singletonList(TOPIC));
+
+    }
 
     /**
      * read the config file
@@ -57,56 +74,9 @@ public class EventConsumer implements Runnable {
         return config;
     }
 
-    /**
-     * stop the executor
-     */
-    public void stop() {
-        logger.info("exiting...");
-        isExiting.set(true);
-        if (consumer != null) {
-            consumer.wakeup(); //exit from poll...
-        }
-    }
-
-    /**
-     * while not stopped, it will send orders...
-     */
-    @Override
-    public void run() {
-
-        try {
-            client = new PreBuiltTransportClient(Settings.builder()
-                    .put("cluster.name", "elasticsearch").build())
-                    .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("40.115.16.108"), 9300));
-        } catch (UnknownHostException e) {
-            logger.error("error",e);
-        }
-
-        try {
-            consumer = new KafkaConsumer<>(setup());
-            consumer.subscribe(Collections.singletonList(TOPIC));
-            while (!isExiting.get()) {
-                consumer.poll(TIMEOUT).forEach(this::process);
-                consumer.commitAsync();
-            }
-
-        } catch (WakeupException w) {
-            //ignoring
-        } catch (Exception e) {
-            logger.error("error", e);
-        } finally {
-            if (consumer != null) {
-                try {
-                    consumer.commitSync();
-                } finally {
-                    consumer.close();
-                }
-            }
-        }
-    }
 
     private void process(ConsumerRecord<String, GenericRecord> event) {
-        logger.debug("received event [{},{}]", event.key(), event.value());
+        logger.info("received event [{},{}]", event.key(), event.value());
         ++received;
 
         try {
@@ -125,5 +95,42 @@ public class EventConsumer implements Runnable {
         } catch (Exception e) {
             logger.error("error while receiving...",e);
         }
+    }
+
+    @Override
+    public void preStart() {
+        logger.info("KafkaSend started");
+    }
+
+    @Override
+    public void postStop() {
+        logger.info("KafkaSend stopped");
+    }
+
+    @Override
+    public Receive createReceive() {
+        return receiveBuilder()
+                .match(Tick.class, tick -> {
+                    try {
+                        logger.info("waiting messages");
+                        consumer.poll(TIMEOUT).forEach(this::process);
+                        consumer.commitAsync(); //asynch
+                        self().tell(tick,self());
+                    } catch (WakeupException w) {
+                        //ignoring
+                    } catch (Exception e) {
+                        logger.error("error", e);
+                    }
+                })
+                .match(Terminated.class, eos -> {
+                    try {
+                        //synch commit before exiting
+                        consumer.commitSync();
+                    } finally {
+                        consumer.close();
+                    }
+                })
+                .matchAny(o -> logger.error("received unknown message"))
+                .build();
     }
 }

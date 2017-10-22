@@ -1,5 +1,8 @@
 package it.gov.daf.km4city.api;
 
+import akka.actor.ActorRef;
+import akka.actor.Props;
+import it.gov.daf.km4city.api.messages.Area;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
@@ -12,6 +15,11 @@ public class ApiLocation extends ApiInvoker {
 
     private static final String url = "http://servicemap.disit.org/WebAppGrafo/api/v1/?selection=";
     private static final String params = "&categories=SensorSite;Car_park&lang=it&format=json";
+    private final ActorRef kafkaSender;
+
+    public ApiLocation(ActorRef kafkaSender) {
+        this.kafkaSender = kafkaSender;
+    }
 
     /**
      * @param c1 lat 1
@@ -50,4 +58,32 @@ public class ApiLocation extends ApiInvoker {
         }
         return result;
     }
+
+    @Override
+    public void preStart() {
+        logger.info("Api Location Application started");
+    }
+
+    @Override
+    public void postStop() {
+        logger.info("Api Location Application stopped");
+    }
+
+    @Override
+    public Receive createReceive() {
+        return receiveBuilder()
+                .match(Area.class, area -> {
+                    logger.debug("receiving area {}",area);
+                    List<JSONObject> sensors = getLocationRecords(area.getLat1(), area.getLong1(), area.getLat2(), area.getLong2());
+                    sensors.forEach( s -> {
+                        ActorRef child = getContext().actorOf(Props.create(ApiEvent.class,kafkaSender));
+                        logger.info("creating child actor for polling events, {}",child);
+                        child.tell(s, getSelf());
+                    });
+                    logger.debug("receiving area done!");
+                })
+                .matchAny(o -> logger.error("received unknown message"))
+                .build();
+    }
+
 }

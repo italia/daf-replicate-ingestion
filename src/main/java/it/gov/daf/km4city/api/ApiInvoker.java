@@ -1,5 +1,6 @@
 package it.gov.daf.km4city.api;
 
+import akka.actor.AbstractActorWithTimers;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -14,7 +15,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-public class ApiInvoker {
+public abstract class ApiInvoker extends AbstractActorWithTimers {
 
     public static final Logger logger = LoggerFactory.getLogger(ApiInvoker.class);
     private final DefaultHttpClient httpClient;
