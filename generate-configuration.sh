@@ -31,13 +31,20 @@ fi
 CATEGORY=$1
 COORDINATES=$2
 MAX_DISTANCE=$3
-SERVICES="?selection=$COORDINATES&categories=$CATEGORY&maxResults=0&maxDists=$MAX_DISTANCE&lang=it&format=json"
+SERVICES="?selection=$COORDINATES&categories=$CATEGORY&maxResults=0&maxDists=$MAX_DISTANCE&lang=it&format=json"i
 
 SERVICE_URIS=`curl $BASE_URL/$SERVICES | tac | tac| jq '.[] | ."features" | .[] | ."properties" | ."serviceUri" '`
 
-for i in $SERVICE_URIS; do
-    echo "    - " $i >> $CONFIGURATION_FILE
-done
+echo "  services:" >> $CONFIGURATION_FILE
 
-echo "[2] Added service URIs from $BASE_URL, if any"
-exit 0
+if [ $CATEGORY == "Car_park" ]; then
+    echo "    parkings:" >> $CONFIGURATION_FILE
+    for i in $SERVICE_URIS; do
+        echo "      - " $i >> $CONFIGURATION_FILE
+    done
+
+    echo "[2] Added service URIs from $BASE_URL, if any"
+    exit 0
+else
+    echo "We only support category Car_park at the moment."
+fi
