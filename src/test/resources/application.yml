@@ -1,9 +1,10 @@
 spring:
+  profiles: kafka-embedded
   kafka:
     bootstrap-servers: ${spring.embedded.kafka.brokers}
 kafka:
    topic:
-    dummy: dummy.t
+    km4city: dummy.t
 km4city:
   base_url: http://servicemap.km4city.org/WebAppGrafo/api/v1/
   services:
@@ -11,3 +12,21 @@ km4city:
       - http://www.disit.org/km4city/resource/RT04801702315PO
       - http://www.disit.org/km4city/resource/79b7b7df3f955ea9cbff956a14226218
       - http://www.disit.org/km4city/resource/RT04801700185PO
+  ingestion_cron: 0 0/30 * * * ?
+--- 
+     
+spring:
+  profiles: kafka
+  kafka:
+    bootstrap-servers: localhost:9092
+kafka:
+   topic:
+    km4city: dummy.t
+km4city:
+  base_url: http://servicemap.km4city.org/WebAppGrafo/api/v1/
+  services:
+    parkings:
+      - http://www.disit.org/km4city/resource/RT04801702315PO
+      - http://www.disit.org/km4city/resource/79b7b7df3f955ea9cbff956a14226218
+      - http://www.disit.org/km4city/resource/RT04801700185PO
+  ingestion_cron: 0 0/2 * * * ?

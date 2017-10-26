@@ -1,0 +1,16 @@
+spring:
+  profiles:
+    active: prod
+  kafka:
+    bootstrap-servers: localhost:9092
+kafka:
+  topic:
+    km4city: km4city.t
+km4city:
+  base_url: http://servicemap.km4city.org/WebAppGrafo/api/v1/
+  services:
+    parkings:
+      - http://www.disit.org/km4city/resource/RT04801702315PO
+      - http://www.disit.org/km4city/resource/79b7b7df3f955ea9cbff956a1422621
+      - http://www.disit.org/km4city/resource/RT04801700185PO
+  ingestion_cron: 0 0/30 * * * ?
