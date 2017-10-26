@@ -17,7 +17,7 @@ public class Km4CityServiceApi extends AbstractKm4CityApiRestClient {
 			
 			JSONObject jsonResponse = new JSONObject(response.getBody());
 			
-			LOGGER.info(jsonResponse.toString());	
+			LOGGER.debug(jsonResponse.toString());	
 			return jsonResponse;
 		} catch(Exception e) {
 			e.printStackTrace();
