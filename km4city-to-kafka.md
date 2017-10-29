@@ -2,12 +2,12 @@
 
 ## Synopsis
 
-In this repository you can find the implementation of a microservice
-that ingests data coming from Replicate's platform into DAF.
+This project implements a microservice that ingests data from
+Replicate's platform into DAF.
 
-By default, the input data is accessed from Km4City's REST API
-endpoint at http://servicemap.disit.org/WebAppGrafo/api/v1/ and
-written to a Kafka topic named `km4city` on `localhost:9092` (see
+By default the input data is accessed from Km4City's REST API endpoint
+at http://servicemap.disit.org/WebAppGrafo/api/v1/ and written to a
+Kafka topic named `km4city` on `localhost:9092` (see
 [Configuration](#Configuration) below).
 
 ## Technologies
@@ -26,7 +26,7 @@ Requirements:
 Just run:
 
 ```shell
-$ mvn install
+$ mvn clean install
 ```
 
 ## Configuration
@@ -38,35 +38,46 @@ We built a small shell script to help the user build a configuration
 based on her/his preferred category, location and maximum distance.
 
 For example, the following command generates a configuration by
-querying the service search API for URIs of services of type
-SensorSite which are no more than 1km distant from Florence SMN Train
-Station:
+querying the service search API for URIs of category Car_park which
+are no more than 0.5km distant from Florence SMN Train Station:
 
-    $ ./generate-configuration.sh SensorSite "43.7756;11.2490" 1
+    $ ./generate-configuration.sh Car_park "43.7756;11.2490" 0.5
 
 To check the effect of the previous command:
 
     $ cat src/main/resources/application.yml
-
-```yaml
+    spring:
+      profiles:
+        active: prod
+      kafka:
+        bootstrap-servers: localhost:9092
     kafka:
-    topic:
-     km4city: km4city.t
-km4city:
-  base_url: http://servicemap.disit.org/WebAppGrafo/api/v1/
-    -  "http://www.disit.org/km4city/resource/FI055ZTL00101"
-    -  "http://www.disit.org/km4city/resource/FI055ZTL01601"
-    -  "http://www.disit.org/km4city/resource/FI055ZTL00801"
-    -  "http://www.disit.org/km4city/resource/FI055ZTL02101"
-    -  "http://www.disit.org/km4city/resource/FI055ZTL01501"
-    -  "http://www.disit.org/km4city/resource/FI055ZTL00901"
-    -  "http://www.disit.org/km4city/resource/FI055ZTL02601"
-    -  "http://www.disit.org/km4city/resource/FI055ZTL01801"
-    -  "http://www.disit.org/km4city/resource/FI055ZTL00301"
-    -  "http://www.disit.org/km4city/resource/FI055ZTL02501"
-    -  "http://www.disit.org/km4city/resource/FI055ZTL00601"
-    -  "http://www.disit.org/km4city/resource/FI055ZTL00501"
-```
+      topic:
+        km4city: km4city.t
+    km4city:
+      base_url: http://servicemap.km4city.org/WebAppGrafo/api/v1/
+      ingestion_cron: 0 0/30 * * * ?
+      parkings:
+        -  "http://www.disit.org/km4city/resource/CarParkStazioneFirenzeS.M.N."
+        -  "http://www.disit.org/km4city/resource/2f414975490c98ffef08b8bf3f01fe02"
+        -  "http://www.disit.org/km4city/resource/0ea2be6c3b1e600f93be94e46144c6af"
+        -  "http://www.disit.org/km4city/resource/79b7b7df3f955ea9cbff956a14226218"
+        -  "http://www.disit.org/km4city/resource/005c6b72fed5acb40800bd6784dc659c"
+        -  "http://www.disit.org/km4city/resource/CarParkS.Lorenzo"
+
+## Running
+
+### With maven
+
+If produced a correct configuration (see above), you can try running
+the microservice(s) with
+
+    mvn spring-boot:run
+
+This expects Kafka to be reachable at localhost:9092.
+
+You can tweak the configuration (`spring.kafka.bootstrap-servers`) if
+you want to use another Kafka broker.
 
 ## Hacking
 
