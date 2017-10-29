@@ -100,7 +100,5 @@ Kafka cluster, with a topic named "km4city".
 - Integrate Avro classes generation in Maven
 - Add docker-compose.yml and a Dockerfile in order to give a complete
   (local) testing environment
-- Add main entry point and document its usage
-- Periodically trigger ingestion
-- REST endpoint to request ingestion of specific services
-- Test with DAF's Kafka cluster
+- Explain how to use the microservice
+- Test with a Kafka cluster
