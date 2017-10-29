@@ -16,7 +16,7 @@ Kafka topic named `km4city` on `localhost:9092` (see
 - Spring Kafka
 - Apache Avro
 
-## Compilation and unit testing
+## Compiling and unit testing
 
 Requirements:
 
@@ -27,6 +27,77 @@ Just run:
 
 ```shell
 $ mvn clean install
+```
+
+## Building the container
+
+### With dockerfile-maven
+
+Thanks to Spotify's [Dockerfile
+Maven](https://github.com/spotify/dockerfile-maven/) plugin, you can
+create a container image for the service with.
+
+```
+$ mvn dockerfile:build
+```
+
+### By hand
+
+If the Maven plugin doesn't work in your setup, try the following:
+
+```
+$ mvn clean install
+[..]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 30.489 s
+[INFO] Finished at: 2017-10-29T20:14:57+01:00
+[INFO] Final Memory: 34M/314M
+[INFO] ------------------------------------------------------------------------
+
+$ docker build -f Dockerfile -t teamdigitale/daf-replicate-ingestion --build-arg JAR_FILE=daf-replicate-ingestion-0.0.1-SNAPSHOT.jar .
+
+Sending build context to Docker daemon  36.53MB
+Step 1/7 : FROM openjdk:8-jdk-alpine
+ ---> 3b1fdb34c52a
+Step 2/7 : MAINTAINER TeamDigitale <teamdigitale@example.com>
+ ---> Using cache
+ ---> 47ac2afbc99a
+Step 3/7 : VOLUME /tmp
+ ---> Using cache
+ ---> ebef3e78ab28
+Step 4/7 : ARG JAR_FILE
+ ---> Using cache
+ ---> 5c7b1b647073
+Step 5/7 : ADD target/${JAR_FILE} app.jar
+ ---> 8e702b945005
+Removing intermediate container c7fd4365691b
+Step 6/7 : ENV JAVA_OPTS ""
+ ---> Running in eb33777a0ab4
+ ---> 271545881bce
+Removing intermediate container eb33777a0ab4
+Step 7/7 : ENTRYPOINT exec java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -jar /app.jar
+ ---> Running in fc5409dcfdd9
+ ---> 3694e138d174
+Removing intermediate container fc5409dcfdd9
+Successfully built 3694e138d174
+Successfully tagged teamdigitale/daf-replicate-ingestion:latest
+
+$ docker create --name k42k teamdigitale/daf-replicate-ingestion
+0af8b1a1055311517efc8b33b0b4bd27e8c052c8ad59471af84dd89a447f5235
+
+$ docker start -a k42k
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::        (v1.5.7.RELEASE)
+
+...
 ```
 
 ## Configuration
@@ -98,7 +169,8 @@ Kafka cluster, with a topic named "km4city".
 ## TODOs
 
 - Integrate Avro classes generation in Maven
+- Add a Dockerfile that allows to obtain an image without a host Maven
 - Add docker-compose.yml and a Dockerfile in order to give a complete
   (local) testing environment
 - Explain how to use the microservice
-- Test with a Kafka cluster
+- Test with an external Kafka cluster
