@@ -7,7 +7,7 @@ Replicate's platform into DAF.
 
 By default the input data is accessed from Km4City's REST API endpoint
 at http://servicemap.disit.org/WebAppGrafo/api/v1/ and written to a
-Kafka topic named `km4city` on `localhost:9092` (see
+Kafka topic named `km4city` on `kafka:9092` (see
 [Configuration](#Configuration) below).
 
 ## Technologies
@@ -26,7 +26,7 @@ Requirements:
 Just run:
 
 ```shell
-$ mvn clean install
+$ mvn clean install spring-boot:repackage
 ```
 
 ## Building the container
@@ -46,7 +46,7 @@ $ mvn dockerfile:build
 If the Maven plugin doesn't work in your setup, try the following:
 
 ```
-$ mvn clean install
+$ mvn clean install spring-boot:repackage
 [..]
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
@@ -105,11 +105,11 @@ $ docker start -a k42k
 A valid YAML configuration file must be written to
 `src/main/resource/application.yml` before compilation.
 
-We built a small shell script to help the user build a configuration
-based on her/his preferred category, location and maximum distance.
+We include a shell script to help the user build a configuration based
+on her/his preferred category, location and maximum distance.
 
 For example, the following command generates a configuration by
-querying the service search API for URIs of category Car_park which
+querying the service search API for URIs of category `Car_park` which
 are no more than 0.5km distant from Florence SMN Train Station:
 
     $ ./generate-configuration.sh Car_park "43.7756;11.2490" 0.5
@@ -140,15 +140,25 @@ To check the effect of the previous command:
 
 ### With maven
 
-If produced a correct configuration (see above), you can try running
+After producing a correct configuration at
+`src/main/resource/application.yml` (see above), you can try running
 the microservice(s) with
 
     mvn spring-boot:run
 
-This expects Kafka to be reachable at localhost:9092.
+This expects Kafka to be reachable at `kafka:9092`.
 
 You can tweak the configuration (`spring.kafka.bootstrap-servers`) if
 you want to use another Kafka broker.
+
+### With docker-compose
+
+In `docker-compose.yml` you can find an example local deployment of
+this microservice with Kafka and Zookeeper.
+
+Just run:
+
+    docker-compose up
 
 ## Hacking
 
@@ -170,7 +180,10 @@ Kafka cluster, with a topic named "km4city".
 
 - Integrate Avro classes generation in Maven
 - Add a Dockerfile that allows to obtain an image without a host Maven
-- Add docker-compose.yml and a Dockerfile in order to give a complete
-  (local) testing environment
-- Explain how to use the microservice
 - Test with an external Kafka cluster
+- Sort out whether spring-boot:repackage should really be called
+  explicitly
+- Document the microservice's Swagger REST API
+- Add a container that consumes the topic and prints (aggregated?)
+  data to console, so that something actually happens when you
+  `docker-compose up`
