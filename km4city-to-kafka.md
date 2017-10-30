@@ -1,14 +1,27 @@
 # Km4City to Kafka
 
-## Synopsis
+## Introduction
 
-This project implements a microservice that ingests data from
-Replicate's platform into DAF.
+This project implements a microservice that ingests data from the
+Km4City REST API into a Kafka topic.
 
-By default the input data is accessed from Km4City's REST API endpoint
-at http://servicemap.km4city.org/WebAppGrafo/api/v1/ and written to a
-Kafka topic named `km4city` on `localhost:9092` (see
-[Configuration](#configuration) below).
+This is a Spring Framework project containing three services,
+[running](#running) in the same JVM:
+
+- a Kafka producer, periodically triggered as prescribed by
+  [`application.yml`](#configuration)
+- a [REST endpoint](#rest-api), allowing to trigger ingestions upon
+  request
+- a periodic consumer, which polls the Kafka topic and logs the
+  messages it finds there for testing purpose
+
+Note that if you do not want the periodic ingestor to do any I/O, you
+can tweak the generated configuration and remove the contained service
+URIs, or just use a cron string far in the future.
+
+By default the input data is accessed from the endpoint at
+http://servicemap.km4city.org/WebAppGrafo/api/v1/ and written to a
+topic named `km4city` on `kafka:9092`.
 
 ## Technologies
 
@@ -40,20 +53,20 @@ searching Service URIs of category `Car_park` which are no more than
 
     $ ./generate-configuration.sh Car_park "43.7756;11.2490" 0.5
 
-You can check the effect of the previous command:
+You can check the effect of the previous command as follows:
 
     $ cat src/main/resources/application.yml
     spring:
       profiles:
         active: prod
       kafka:
-        bootstrap-servers: localhost:9092
+        bootstrap-servers: kafka:9092
     kafka:
       topic:
-        km4city: km4city.t
+        km4city: km4city
     km4city:
       base_url: http://servicemap.km4city.org/WebAppGrafo/api/v1/
-      ingestion_cron: 0 0/30 * * * ?
+      ingestion_cron: 0/30 * * * * ?
       parkings:
         -  "http://www.disit.org/km4city/resource/CarParkStazioneFirenzeS.M.N."
         -  "http://www.disit.org/km4city/resource/2f414975490c98ffef08b8bf3f01fe02"
@@ -61,6 +74,9 @@ You can check the effect of the previous command:
         -  "http://www.disit.org/km4city/resource/79b7b7df3f955ea9cbff956a14226218"
         -  "http://www.disit.org/km4city/resource/005c6b72fed5acb40800bd6784dc659c"
         -  "http://www.disit.org/km4city/resource/CarParkS.Lorenzo"
+
+If you want to change other parts of the configuration, just tweak it
+after generating it.
 
 ## Compilation and testing
 
@@ -162,10 +178,9 @@ the microservice(s) with
 
     mvn spring-boot:run
 
-This expects Kafka to be reachable at `kafka:9092`.
-
-You can tweak the configuration (`spring.kafka.bootstrap-servers`) if
-you want to use another Kafka broker.
+This expects Kafka to be reachable at `kafka:9092`. You can tweak the
+configuration (`spring.kafka.bootstrap-servers`) if you want to use
+another Kafka broker.
 
 ### With docker-compose
 
@@ -175,6 +190,14 @@ this microservice with Kafka and Zookeeper.
 Just run:
 
     docker-compose up
+
+## REST API
+
+The microservice sports a Swagger-generated REST API.
+
+If you run the service with maven or docker-compose with standard
+configuration, you can find the Swagger UI documenting the API at
+http://localhost:8080/swagger-ui.html .
 
 ## Hacking
 
@@ -197,5 +220,4 @@ Kafka cluster, with a topic named "km4city".
 - Integrate Avro classes generation in Maven
 - Add a Dockerfile that gives an image without a host Maven
 - Test with an external Kafka cluster
-- Document the microservice's Swagger REST API
 - Find out if `spring-boot:repackage` must really be called explicitly
