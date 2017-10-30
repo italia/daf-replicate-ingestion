@@ -33,7 +33,7 @@ COORDINATES=$2
 MAX_DISTANCE=$3
 SERVICES="?selection=$COORDINATES&categories=$CATEGORY&maxResults=0&maxDists=$MAX_DISTANCE&lang=it&format=json"i
 
-SERVICE_URIS=`curl $BASE_URL/$SERVICES | tac | tac| jq '.[] | ."features" | .[] | ."properties" | ."serviceUri" '`
+SERVICE_URIS=`curl $BASE_URL/$SERVICES | jq '.[] | ."features" | .[] | ."properties" | ."serviceUri" '`
 
 echo "  services:" >> $CONFIGURATION_FILE
 
