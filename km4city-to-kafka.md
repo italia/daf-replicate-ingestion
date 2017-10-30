@@ -6,8 +6,8 @@ This project implements a microservice that ingests data from
 Replicate's platform into DAF.
 
 By default the input data is accessed from Km4City's REST API endpoint
-at http://servicemap.disit.org/WebAppGrafo/api/v1/ and written to a
-Kafka topic named `km4city` on `kafka:9092` (see
+at http://servicemap.km4city.org/WebAppGrafo/api/v1/ and written to a
+Kafka topic named `km4city` on `localhost:9092` (see
 [Configuration](#Configuration) below).
 
 ## Technologies
