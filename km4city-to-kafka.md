@@ -56,6 +56,9 @@ $ mvn clean install spring-boot:repackage
 [INFO] Final Memory: 34M/314M
 [INFO] ------------------------------------------------------------------------
 
+$ docker rm dafreplicateingestion_k42k_1 && docker rmi dafreplicateingestion_k42k
+[..]
+
 $ docker build -f Dockerfile -t teamdigitale/daf-replicate-ingestion --build-arg JAR_FILE=daf-replicate-ingestion-0.0.1-SNAPSHOT.jar .
 
 Sending build context to Docker daemon  36.53MB
