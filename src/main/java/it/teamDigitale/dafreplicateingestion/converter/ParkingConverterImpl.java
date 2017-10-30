@@ -7,7 +7,9 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.json.JSONArray;
@@ -26,41 +28,31 @@ import it.teamDigitale.avro.Event;
  *
  */
 @Component
-public class ParkingConverterImpl implements Converter{
+public class ParkingConverterImpl implements Converter {
 	@Value("${km4city.base_url}")
 	private String host;
-	
+
 	@Override
 	public Event convertToEvent(JSONObject toBeConverted) {
 		try {
-			JSONArray coordinates = toBeConverted
-					.getJSONObject("Service")
-					.getJSONArray("features")
-					.getJSONObject(0)
-					.getJSONObject("geometry")
-					.getJSONArray("coordinates");
+			JSONArray coordinates = toBeConverted.getJSONObject("Service").getJSONArray("features").getJSONObject(0)
+					.getJSONObject("geometry").getJSONArray("coordinates");
 			String location = coordinates.get(0) + "-" + coordinates.get(1);
-			String service = toBeConverted
-					.getJSONObject("Service")
-					.getJSONArray("features")
-					.getJSONObject(0)
-					.getJSONObject("properties")
-					.getString("serviceUri");
-			long timestamp = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX").parse(toBeConverted
-					.getJSONObject("realtime")
-					.getJSONObject("results")
-					.getJSONArray("bindings")
-					.getJSONObject(0)
-					.getJSONObject("updating")
-					.getString("value")).getTime();
+			String service = toBeConverted.getJSONObject("Service").getJSONArray("features").getJSONObject(0)
+					.getJSONObject("properties").getString("serviceUri");
+			long timestamp = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
+					.parse(toBeConverted.getJSONObject("realtime").getJSONObject("results").getJSONArray("bindings")
+							.getJSONObject(0).getJSONObject("updating").getString("value"))
+					.getTime();
 			ByteBuffer body = ByteBuffer.wrap(toBeConverted.toString().getBytes());
-			@SuppressWarnings("unchecked")
-			Map<CharSequence, CharSequence> attributes = new ObjectMapper().readValue(toBeConverted
-					.getJSONObject("realtime").toString(), HashMap.class);
-			
-			return Event.newBuilder()
-					.setLocation(location)
-					.setAttributes(attributes)
+
+			 @SuppressWarnings("unchecked")
+			 Map<String, LinkedHashMap<String, ArrayList<String>>> attributes = new ObjectMapper().readValue(toBeConverted
+			 .getJSONObject("realtime").toString(), HashMap.class);
+			 
+			return Event.newBuilder().setLocation(location)
+					//.setAttributes(attributes)
+					.setAttributes(new HashMap<CharSequence, CharSequence>())
 					.setBody(body)
 					.setHost(host)
 					.setService(service)
@@ -68,7 +60,7 @@ public class ParkingConverterImpl implements Converter{
 					.setId("Km4CityParking")
 					.setEventTypeId(1)
 					.build();
-			
+
 		} catch (JSONException | ParseException | IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
