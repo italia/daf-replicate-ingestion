@@ -8,7 +8,7 @@ Replicate's platform into DAF.
 By default the input data is accessed from Km4City's REST API endpoint
 at http://servicemap.km4city.org/WebAppGrafo/api/v1/ and written to a
 Kafka topic named `km4city` on `localhost:9092` (see
-[Configuration](#Configuration) below).
+[Configuration](#configuration) below).
 
 ## Technologies
 
@@ -16,9 +16,53 @@ Kafka topic named `km4city` on `localhost:9092` (see
 - Spring Kafka
 - Spring Retry
 - Springfox Swagger2 & UI
-- Apache Avro 
+- Apache Avro
 
-## Compiling and unit testing
+## Configuration
+
+A valid YAML configuration file must be written to
+`src/main/resource/application.yml` before building.
+
+We include a shell script `generate_configuration.sh` to help the user
+define a configuration based on her/his preferred service Category,
+Location and Maximum Distance. This is achieved by querying km4city's
+Service Search API.
+
+The script requires the following programs to be available:
+
+- bash
+- curl
+- jq
+
+For example, the following command generates a configuration by
+searching Service URIs of category `Car_park` which are no more than
+0.5km distant from Florence SMN Train Station:
+
+    $ ./generate-configuration.sh Car_park "43.7756;11.2490" 0.5
+
+You can check the effect of the previous command:
+
+    $ cat src/main/resources/application.yml
+    spring:
+      profiles:
+        active: prod
+      kafka:
+        bootstrap-servers: localhost:9092
+    kafka:
+      topic:
+        km4city: km4city.t
+    km4city:
+      base_url: http://servicemap.km4city.org/WebAppGrafo/api/v1/
+      ingestion_cron: 0 0/30 * * * ?
+      parkings:
+        -  "http://www.disit.org/km4city/resource/CarParkStazioneFirenzeS.M.N."
+        -  "http://www.disit.org/km4city/resource/2f414975490c98ffef08b8bf3f01fe02"
+        -  "http://www.disit.org/km4city/resource/0ea2be6c3b1e600f93be94e46144c6af"
+        -  "http://www.disit.org/km4city/resource/79b7b7df3f955ea9cbff956a14226218"
+        -  "http://www.disit.org/km4city/resource/005c6b72fed5acb40800bd6784dc659c"
+        -  "http://www.disit.org/km4city/resource/CarParkS.Lorenzo"
+
+## Compilation and testing
 
 Requirements:
 
@@ -33,11 +77,14 @@ $ mvn clean install spring-boot:repackage
 
 ## Building the container
 
+Before building the container you must generate a valid configuration
+in `src/resources/application.yml` (see above).
+
 ### With dockerfile-maven
 
 Thanks to Spotify's [Dockerfile
 Maven](https://github.com/spotify/dockerfile-maven/) plugin, you can
-create a container image for the service with.
+create a container image for the service as follows:
 
 ```
 $ mvn dockerfile:build
@@ -105,42 +152,6 @@ $ docker start -a k42k
 ...
 ```
 
-## Configuration
-
-A valid YAML configuration file must be written to
-`src/main/resource/application.yml` before compilation.
-
-We include a shell script to help the user build a configuration based
-on her/his preferred category, location and maximum distance.
-
-For example, the following command generates a configuration by
-querying the service search API for URIs of category `Car_park` which
-are no more than 0.5km distant from Florence SMN Train Station:
-
-    $ ./generate-configuration.sh Car_park "43.7756;11.2490" 0.5
-
-To check the effect of the previous command:
-
-    $ cat src/main/resources/application.yml
-    spring:
-      profiles:
-        active: prod
-      kafka:
-        bootstrap-servers: localhost:9092
-    kafka:
-      topic:
-        km4city: km4city.t
-    km4city:
-      base_url: http://servicemap.km4city.org/WebAppGrafo/api/v1/
-      ingestion_cron: 0 0/30 * * * ?
-      parkings:
-        -  "http://www.disit.org/km4city/resource/CarParkStazioneFirenzeS.M.N."
-        -  "http://www.disit.org/km4city/resource/2f414975490c98ffef08b8bf3f01fe02"
-        -  "http://www.disit.org/km4city/resource/0ea2be6c3b1e600f93be94e46144c6af"
-        -  "http://www.disit.org/km4city/resource/79b7b7df3f955ea9cbff956a14226218"
-        -  "http://www.disit.org/km4city/resource/005c6b72fed5acb40800bd6784dc659c"
-        -  "http://www.disit.org/km4city/resource/CarParkS.Lorenzo"
-
 ## Running
 
 ### With maven
@@ -184,11 +195,7 @@ Kafka cluster, with a topic named "km4city".
 ## TODOs
 
 - Integrate Avro classes generation in Maven
-- Add a Dockerfile that allows to obtain an image without a host Maven
+- Add a Dockerfile that gives an image without a host Maven
 - Test with an external Kafka cluster
-- Sort out whether spring-boot:repackage should really be called
-  explicitly
 - Document the microservice's Swagger REST API
-- Add a container that consumes the topic and prints (aggregated?)
-  data to console, so that something actually happens when you
-  `docker-compose up`
+- Find out if `spring-boot:repackage` must really be called explicitly
