@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import it.teamDigitale.dafreplicateingestion.converter.ConverterType;
 import it.teamDigitale.dafreplicateingestion.model.api.IngestionParams;
 
 /**
@@ -34,7 +33,7 @@ public class ScheduledIngestionService extends AbstractIngestionService {
 		IngestionParams ingestion = new IngestionParams();
 		ingestion.setServices(availableServices.getParkings());
 		ingestion.setTopic(topic);
-		ingestion.setServiceType(ConverterType.PARKING);
+		ingestion.setServiceType(Km4CityServiceType.PARKING);
 		super.ingest(ingestion);
 		LOGGER.info("Scheduled ingestion stopped!");
 	}

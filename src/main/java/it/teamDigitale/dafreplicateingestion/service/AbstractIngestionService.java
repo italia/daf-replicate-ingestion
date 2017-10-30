@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import it.teamDigitale.avro.Event;
-import it.teamDigitale.dafreplicateingestion.converter.Converter;
+import it.teamDigitale.dafreplicateingestion.converter.ParkingConverterImpl;
 import it.teamDigitale.dafreplicateingestion.km4cityclient.Km4CityServiceApi;
 import it.teamDigitale.dafreplicateingestion.model.api.IngestionParams;
 import it.teamDigitale.dafreplicateingestion.producer.Sender;
@@ -27,11 +27,13 @@ public abstract class AbstractIngestionService {
 	@Autowired
 	private Sender sender;
 	
+	@Autowired
+	private ParkingConverterImpl parkingConverterImpl;
+	
 	protected void ingest(IngestionParams ingestion) {
-		Converter converter = ingestion.getServiceType().buildConverter();
 		for(String service : ingestion.getServices()) {
 			JSONObject response = serviceApi.consume(service);
-			Event event = converter.convertToEvent(response);
+			Event event = parkingConverterImpl.convertToEvent(response);
 			sender.send(event, ingestion.getTopic());
 		}
 	}

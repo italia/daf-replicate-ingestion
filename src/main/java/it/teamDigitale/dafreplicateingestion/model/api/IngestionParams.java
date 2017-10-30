@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import it.teamDigitale.dafreplicateingestion.converter.ConverterType;
+import it.teamDigitale.dafreplicateingestion.service.Km4CityServiceType;
 
 /**
  * @author alessandro
@@ -24,13 +24,13 @@ public class IngestionParams {
 	private String topic;
 	@JsonProperty("service-type")
 	@NotNull
-	private ConverterType serviceType;
+	private Km4CityServiceType serviceType;
 
 	/**
 	 * @param services
 	 * @param topic
 	 */
-	public IngestionParams(List<String> services, String topic, ConverterType serviceType) {
+	public IngestionParams(List<String> services, String topic, Km4CityServiceType serviceType) {
 		this.services = services;
 		this.topic = topic;
 		this.serviceType = serviceType;
@@ -73,14 +73,14 @@ public class IngestionParams {
 	/**
 	 * @return the serviceType
 	 */
-	public ConverterType getServiceType() {
+	public Km4CityServiceType getServiceType() {
 		return serviceType;
 	}
 
 	/**
 	 * @param serviceType the serviceType to set
 	 */
-	public void setServiceType(ConverterType serviceType) {
+	public void setServiceType(Km4CityServiceType serviceType) {
 		this.serviceType = serviceType;
 	}
 
