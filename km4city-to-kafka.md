@@ -14,7 +14,9 @@ Kafka topic named `km4city` on `kafka:9092` (see
 
 - Spring Boot
 - Spring Kafka
-- Apache Avro
+- Spring Retry
+- Springfox Swagger2 & UI
+- Apache Avro 
 
 ## Compiling and unit testing
 
