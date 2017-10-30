@@ -2,8 +2,8 @@
 
 CONFIGURATION_FILE=src/main/resources/application.yml
 BASE_URL=http://servicemap.km4city.org/WebAppGrafo/api/v1/
-KAFKA=localhost:9092
-CRON_EXPRESSION="0 0/30 * * * ?"
+KAFKA=kafka:9092
+CRON_EXPRESSION="0/30 * * * * ?"
 
 echo -n >${CONFIGURATION_FILE}
 
@@ -15,7 +15,7 @@ spring:
     bootstrap-servers: $KAFKA
 kafka:
   topic:
-    km4city: km4city.t
+    km4city: km4city
 km4city:
   base_url: $BASE_URL
   ingestion_cron: $CRON_EXPRESSION
@@ -33,7 +33,7 @@ COORDINATES=$2
 MAX_DISTANCE=$3
 SERVICES="?selection=$COORDINATES&categories=$CATEGORY&maxResults=0&maxDists=$MAX_DISTANCE&lang=it&format=json"i
 
-SERVICE_URIS=`curl $BASE_URL/$SERVICES | tac | tac| jq '.[] | ."features" | .[] | ."properties" | ."serviceUri" '`
+SERVICE_URIS=`curl $BASE_URL/$SERVICES | jq '.[] | ."features" | .[] | ."properties" | ."serviceUri" '`
 
 echo "  services:" >> $CONFIGURATION_FILE
 
