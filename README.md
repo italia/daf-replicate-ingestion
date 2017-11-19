@@ -1,12 +1,12 @@
-# PyData
-Python implementation of a microservice which links Torino traffic datacenter with Kafka
+# TurinFlow
+Python implementation of a microservice which links Torino traffic datacenter with Kafka. This project was developed during an hackathon for Public administration. The software uses the API of Turin's traffic and through Avro and Kafka provides data to end users
 ## Requirements
 * [Zookeeper 3.4.x](https://zookeeper.apache.org/releases.html#download)
 * [Kafka 0.10.x](https://kafka.apache.org/downloads)
 * [PyKafka](https://github.com/Parsely/pykafka)
 * [Avro 1.8.x](http://avro.apache.org/releases.html)
-## Transform all data into an internal format (i.e. Event) 
-I use Apache Avro to serialize data to Kafka. 
+## Transform all data into an internal format (i.e. Event)
+I use Apache Avro to serialize data to Kafka.
 A generic Event is defined as follows:
 * Version (long) - Version of this schema
 * ID ([null,string]) - A globally unique identifier for this event.
@@ -17,4 +17,4 @@ A generic Event is defined as follows:
 * Host (string) - Hostname, IP, or other device identifier from which the event was generated. Required.
 * Service (string) - Service or process from which the event was generated. Required.
 * Body (byte array) - Raw event content in bytes. Optional.
-* Attributes ({ "type": "map", "values": "string" }) - the combination of a tag key-value 
+* Attributes ({ "type": "map", "values": "string" }) - the combination of a tag key-value
