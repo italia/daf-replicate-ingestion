@@ -1,15 +1,17 @@
-package it.gov.daf.km4city.api.messages;
+package it.gov.daf.km4city.actors.messages;
 
 /**
- * immutable object, starting message for ApiLocation actor
+ * in scala this should like simply case class StartArea(...) :)
+ *
+ * immutable object, starting message for ApiSupervisor actor
  */
-public class Area {
+public class StartArea {
     private double lat1;
     private double long1;
     private double lat2;
     private double long2;
 
-    public Area(double lat1, double long1, double lat2, double long2) {
+    public StartArea(double lat1, double long1, double lat2, double long2) {
         this.lat1 = lat1;
         this.long1 = long1;
         this.lat2 = lat2;
@@ -37,7 +39,7 @@ public class Area {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Area area = (Area) o;
+        StartArea area = (StartArea) o;
 
         if (Double.compare(area.lat1, lat1) != 0) return false;
         if (Double.compare(area.long1, long1) != 0) return false;
@@ -62,7 +64,7 @@ public class Area {
 
     @Override
     public String toString() {
-        return "Area{" +
+        return "StartArea{" +
                 "lat1=" + lat1 +
                 ", long1=" + long1 +
                 ", lat2=" + lat2 +

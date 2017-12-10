@@ -1,2 +1,5 @@
-/target/
-/nbproject/
+target
+nbproject
+*log
+*iml
+.idea

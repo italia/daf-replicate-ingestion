@@ -1,4 +1,4 @@
-package it.gov.daf.km4city.api;
+package it.gov.daf.km4city.actors;
 
 import akka.actor.AbstractActorWithTimers;
 import org.apache.http.HttpResponse;

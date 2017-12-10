@@ -1,10 +1,10 @@
-package it.gov.daf.km4city.producer;
+package it.gov.daf.km4city.actors;
 
 import akka.actor.AbstractActor;
 import akka.actor.Terminated;
-import it.gov.daf.km4city.Main;
+import it.gov.daf.km4city.actors.messages.GetStats;
+import it.gov.daf.km4city.actors.messages.Stats;
 import it.teamDigitale.avro.Event;
-import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,15 +13,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-public class KafkaSend extends AbstractActor {
+public class KafkaProducer extends AbstractActor {
 
 
-    private static final Logger logger = LoggerFactory.getLogger(KafkaSend.class);
-    private static final String TOPIC = "OUTPUT_TOPIC";
-    private final KafkaProducer<String, Event> producer;
+    private static final Logger logger = LoggerFactory.getLogger(KafkaProducer.class);
+    private static final String TOPIC = "KM4CITY.";
+    private final org.apache.kafka.clients.producer.KafkaProducer producer;
+    private int ok;
+    private int ko;
 
-    public KafkaSend() throws IOException {
-        producer = new KafkaProducer<>(setup());
+    public KafkaProducer() throws IOException {
+        producer = new org.apache.kafka.clients.producer.KafkaProducer(setup());
         logger.info("path {}",getSelf().path());
     }
 
@@ -41,43 +43,14 @@ public class KafkaSend extends AbstractActor {
         return config;
     }
 
-
-//    /**
-//     * while not stopped, it will send events...
-//     */
-//    @Override
-//    public void run() {
-//         =null;
-//        try {
-//
-//            while (!isExiting.get()) {
-//                Event event = (Event) queue.take();
-//                logger.info("sending event {}", event);
-//                final ProducerRecord<String, Event> record = new ProducerRecord<>(TOPIC, event);
-//                producer.send(record, (metadata, e) -> {
-//                    if (e != null) {
-//                        //error handling
-//                        logger.error("error while sending ", e);
-//                    }
-//                });
-//            }
-//        } catch (Exception e) {
-//            logger.error("error", e);
-//        } finally {
-//            if (producer != null) {
-//                producer.close();
-//            }
-//        }
-//    }
-
     @Override
     public void preStart() {
-        logger.info("KafkaSend started");
+        logger.info("KafkaProducer started");
     }
 
     @Override
     public void postStop() {
-        logger.info("KafkaSend stopped");
+        logger.info("KafkaProducer stopped");
     }
 
     @Override
@@ -86,16 +59,26 @@ public class KafkaSend extends AbstractActor {
                 .match(Event.class, event -> {
                     try {
                         logger.info("sending event {}", event);
-                        final ProducerRecord<String, Event> record = new ProducerRecord<>(TOPIC, event);
+                        final ProducerRecord<String, Event> record = new ProducerRecord<>(TOPIC+event.getSource(), event);
                         producer.send(record, (metadata, e) -> {
                             if (e != null) {
                                 //error handling
                                 logger.error("error while sending ", e);
+                                synchronized (this) {
+                                    ko++;
+                                }
                             }
                         });
                     } catch (Exception e) {
                         logger.error("error", e);
+                        synchronized (this) {
+                            ko++;
+                        }
                     }
+                    ok++;
+                })
+                .match(GetStats.class, getStats -> {
+                    getSender().tell(new Stats("kafka_producer", ok,ko),getSelf());
                 })
                 .match(Terminated.class, eos -> producer.close())
                 .matchAny(o -> logger.error("received unknown message"))
