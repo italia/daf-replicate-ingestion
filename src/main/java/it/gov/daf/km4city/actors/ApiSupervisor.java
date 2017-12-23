@@ -36,12 +36,12 @@ public class ApiSupervisor extends ApiInvoker {
 
     @Override
     public void preStart() {
-        logger.info("Api Location Application started");
+        logger.info("Supervisor started");
     }
 
     @Override
     public void postStop() {
-        logger.info("Api Location Application stopped");
+        logger.info("Supervisor stopped");
     }
 
     @Override
