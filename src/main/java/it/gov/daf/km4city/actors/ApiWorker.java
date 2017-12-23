@@ -4,7 +4,9 @@ import akka.actor.ActorRef;
 import akka.actor.Terminated;
 import it.gov.daf.km4city.Km4CityMicroservice;
 import it.gov.daf.km4city.actors.messages.GetStats;
+import it.gov.daf.km4city.actors.messages.Resume;
 import it.gov.daf.km4city.actors.messages.Stats;
+import it.gov.daf.km4city.actors.messages.Stop;
 import it.gov.daf.km4city.converter.UtilConverter;
 import it.teamDigitale.avro.Event;
 import org.json.simple.JSONObject;
@@ -20,12 +22,16 @@ public class ApiWorker extends ApiInvoker {
     private final ActorRef esSink;
 
     private final int polling;
+    private Status status;
 
     private int ok;
     private int ko;
 
+    enum Status {RUNNING, PAUSED}
+
     public ApiWorker() {
         super();
+        this.status = Status.RUNNING;
         this.polling=Km4CityMicroservice.ActorContext.polling;
         this.kafkaSender = Km4CityMicroservice.ActorContext.kafkaProducer;
         this.esSink = Km4CityMicroservice.ActorContext.elasticSink;
@@ -84,11 +90,30 @@ public class ApiWorker extends ApiInvoker {
                     getSender().tell(new Stats(getUri(), ok,ko),getSelf());
                 })
                 .match(Terminated.class, end -> logger.info("exiting"))
+                .match(Stop.class, message -> {
+                    if (status == Status.RUNNING) {
+                        logger.info("stopping");
+                        getSender().tell(message, getSelf());
+                        status = Status.PAUSED;
+                    }
+                })
+                .match(Resume.class, message -> {
+                    if (status == Status.PAUSED) {
+                        logger.info("resuming");
+                        getSender().tell(message, getSelf());
+                        status = Status.RUNNING;
+                    }
+                })
                 .matchAny(o -> logger.error("received unknown message"))
                 .build();
     }
 
     private void handlePollingRequest() throws IOException, ParseException {
+
+        if (status == Status.PAUSED) {
+            return;
+        }
+
         try {
             logger.debug("receiving json message {}", json);
             JSONObject event = getEventsFromJsonReply();

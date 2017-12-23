@@ -7,9 +7,7 @@ import akka.http.javadsl.model.HttpResponse;
 import akka.pattern.Patterns;
 import akka.util.Timeout;
 import it.gov.daf.km4city.Km4CityMicroservice;
-import it.gov.daf.km4city.actors.messages.GetStats;
-import it.gov.daf.km4city.actors.messages.StartArea;
-import it.gov.daf.km4city.actors.messages.Stats;
+import it.gov.daf.km4city.actors.messages.*;
 import it.gov.daf.km4city.converter.UtilConverter;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -27,9 +25,10 @@ public class ApiSupervisor extends ApiInvoker {
 
     private static final String url = "http://servicemap.disit.org/WebAppGrafo/api/v1/?selection=";
     private static final String params = "&categories=SensorSite;Car_park&lang=it&format=json";
-    private final static List<ActorRef> actors = new ArrayList<>();
+    private final List<ActorRef> actors;
 
     public ApiSupervisor() {
+        actors = new ArrayList<>();
         actors.add(Km4CityMicroservice.ActorContext.elasticSink);
         actors.add(Km4CityMicroservice.ActorContext.kafkaProducer);
     }
@@ -63,7 +62,7 @@ public class ApiSupervisor extends ApiInvoker {
                     final Timeout timeout = new Timeout(5, TimeUnit.SECONDS);
                     List<Stats> fetchedStats = actors.stream()
                             .map(
-                                    c -> Patterns.ask(c, getStats, timeout)
+                                    child -> Patterns.ask(child, getStats, timeout)
                             ).map(
                                     future -> {
                                         Stats stats = null;
@@ -85,6 +84,38 @@ public class ApiSupervisor extends ApiInvoker {
 
                     getSender().tell(httpResponse, getSelf());
 
+
+                })
+                .match(Stop.class, message -> {
+                    logger.info("stopping");
+                    final Timeout timeout = new Timeout(5, TimeUnit.SECONDS);
+                    actors.stream()
+                            .forEach(
+                                    child -> Patterns.ask(child, message, timeout)
+                            );
+
+                    HttpResponse httpResponse = HttpResponse.create()
+                            .withEntity(ContentTypes.APPLICATION_JSON,
+                                    "{\"status\":\"stopped\"}"
+                            );
+
+                    getSender().tell(httpResponse, getSelf());
+
+                })
+                .match(Resume.class, message -> {
+                    logger.info("resuming");
+                    final Timeout timeout = new Timeout(5, TimeUnit.SECONDS);
+                    actors.stream()
+                            .forEach(
+                                    child -> Patterns.ask(child, message, timeout)
+                            );
+
+                    HttpResponse httpResponse = HttpResponse.create()
+                            .withEntity(ContentTypes.APPLICATION_JSON,
+                                    "{\"status\":\"running\"}"
+                            );
+
+                    getSender().tell(httpResponse, getSelf());
 
                 })
                 .matchAny(o -> logger.error("received unknown message {}", o))

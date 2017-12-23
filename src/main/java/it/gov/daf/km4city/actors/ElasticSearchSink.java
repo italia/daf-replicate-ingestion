@@ -3,7 +3,9 @@ package it.gov.daf.km4city.actors;
 import akka.actor.AbstractActor;
 import akka.actor.Terminated;
 import it.gov.daf.km4city.actors.messages.GetStats;
+import it.gov.daf.km4city.actors.messages.Resume;
 import it.gov.daf.km4city.actors.messages.Stats;
+import it.gov.daf.km4city.actors.messages.Stop;
 import it.teamDigitale.avro.Event;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.transport.TransportClient;
@@ -108,6 +110,13 @@ public class ElasticSearchSink extends AbstractActor {
                 })
                 .match(GetStats.class, getStats -> {
                     getSender().tell(new Stats("elasticsearch", ok,ko),getSelf());
+                })
+                .match(Stop.class, message -> {
+                    getSender().tell(message, getSelf());
+                })
+                .match(Resume.class, message -> {
+                    getSender().tell(message, getSelf());
+
                 })
                 .match(Terminated.class, eos -> client.close())
                 .matchAny(o -> logger.error("received unknown message"))

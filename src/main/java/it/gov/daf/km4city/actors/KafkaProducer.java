@@ -3,7 +3,9 @@ package it.gov.daf.km4city.actors;
 import akka.actor.AbstractActor;
 import akka.actor.Terminated;
 import it.gov.daf.km4city.actors.messages.GetStats;
+import it.gov.daf.km4city.actors.messages.Resume;
 import it.gov.daf.km4city.actors.messages.Stats;
+import it.gov.daf.km4city.actors.messages.Stop;
 import it.teamDigitale.avro.Event;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
@@ -79,6 +81,13 @@ public class KafkaProducer extends AbstractActor {
                 })
                 .match(GetStats.class, getStats -> {
                     getSender().tell(new Stats("kafka_producer", ok,ko),getSelf());
+                })
+                .match(Stop.class, message -> {
+                    getSender().tell(message, getSelf());
+                })
+                .match(Resume.class, message -> {
+                    getSender().tell(message, getSelf());
+
                 })
                 .match(Terminated.class, eos -> producer.close())
                 .matchAny(o -> logger.error("received unknown message"))

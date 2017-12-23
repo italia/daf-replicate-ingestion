@@ -1,13 +1,12 @@
 package it.gov.daf.km4city.avro;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.StringReader;
 import org.apache.avro.Schema;
-import org.apache.avro.file.FileReader;
 import org.apache.avro.generic.GenericRecord;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.IOException;
+import java.io.StringReader;
 
 import static org.junit.Assert.assertEquals;
 

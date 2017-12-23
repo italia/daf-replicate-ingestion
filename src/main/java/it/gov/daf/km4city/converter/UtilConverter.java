@@ -2,8 +2,6 @@ package it.gov.daf.km4city.converter;
 
 import it.gov.daf.km4city.actors.messages.Stats;
 import it.teamDigitale.avro.Event;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.io.IOException;
@@ -17,35 +15,18 @@ public class UtilConverter {
 
     public static void convertEvent(JSONObject item, Event output) throws IOException {
 
-        final JSONObject sensor = (JSONObject) item.get("Sensor");
-
         long timestamp = System.nanoTime();
         output.setEventTypeId(EVENT);
         output.setTs(timestamp);
         output.setBody(ByteBuffer.wrap(item.toJSONString().getBytes()));
-        output.setAttributes(new ObjectMapper().readValue(item.toJSONString(), HashMap.class));
+        output.setAttributes(new HashMap());
 
+        output.setSource("SENSOR");
+        output.setId("SENSOR"+timestamp);
+        output.setHost("host");
+        output.setLocation("location");
+        output.setService("type");
 
-        try {
-
-            final JSONObject features = (JSONObject) ((JSONArray) sensor.get("features")).get(0);
-            final JSONObject properties = (JSONObject) features.get("properties");
-            //uri of the sensor
-            final String serviceUri = (String) properties.get("serviceUri");
-            final String sensorName = (String) properties.get("name");
-            final String serviceType = (String) properties.get("serviceType");
-            //geolocation
-            final JSONObject location = (JSONObject) features.get("geometry");
-
-            output.setSource(sensorName);
-            output.setId(sensorName+timestamp);
-            output.setHost(serviceUri);
-            output.setLocation(location.toJSONString());
-            output.setService(serviceType);
-
-        } catch (Exception parsingException) {
-
-        }
     }
 
     public static String statsToJson(final List<Stats> stats) {
