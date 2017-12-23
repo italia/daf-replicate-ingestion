@@ -11,13 +11,24 @@ The service can started and resumed with the rest call:
 ```bash
 curl -XGET http://localhost:8080/pause
 ```
+
+
 ```js
+{
+  "status": "stopped"
+}
+
 ```
 
 ```bash
-```
 curl -XGET http://localhost:8080/resume
+```
+
 ```js
+{
+  "status": "running"
+}
+
 ```
 
 It is also possible to check the health of the service:
