@@ -1,0 +1,76 @@
+version: "3"
+services:
+  zookeeper:
+      image: confluentinc/cp-zookeeper:3.3.0
+      hostname: zookeeper
+      restart: always
+      environment:
+        ZOOKEEPER_SERVER_ID: 1
+        ZOOKEEPER_CLIENT_PORT: "2181"
+        ZOOKEEPER_TICK_TIME: "2000"
+        ZOOKEEPER_SERVERS: "zookeeper:22888:23888"
+      ports:
+        - "2181:2181"
+  kafka1:
+    image: confluentinc/cp-enterprise-kafka:3.3.0
+    hostname: kafka1
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+      - "29092:29092"
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka1:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_METRIC_REPORTERS: "io.confluent.metrics.reporter.ConfluentMetricsReporter"
+      KAFKA_BROKER_ID: 1
+      KAFKA_BROKER_RACK: "r1"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      CONFLUENT_METRICS_REPORTER_BOOTSTRAP_SERVERS: "kafka1:9092"
+      CONFLUENT_METRICS_REPORTER_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      CONFLUENT_METRICS_REPORTER_TOPIC_REPLICAS: 1
+      CONFLUENT_METRICS_REPORTER_MAX_REQUEST_SIZE: 10485760
+      # To avoid race condition with control-center
+      CONFLUENT_METRICS_REPORTER_TOPIC_CREATE: "false"
+      KAFKA_DELETE_TOPIC_ENABLE: "true"
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      #KAFKA_LOG4J_ROOT_LOGLEVEL: INFO
+      KAFKA_JMX_PORT: 9991
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:5.6.0
+    restart: always
+    hostname: elasticsearch
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      xpack.security.enabled: "false"
+  schemaregistry:
+    image: confluentinc/cp-schema-registry:3.3.0
+    hostname: schemaregistry
+    restart: always
+    depends_on:
+      - zookeeper
+    environment:
+      SCHEMA_REGISTRY_KAFKASTORE_CONNECTION_URL: "zookeeper:2181"
+      SCHEMA_REGISTRY_HOST_NAME: schemaregistry
+      SCHEMA_REGISTRY_LISTENERS: "http://0.0.0.0:8081"
+    ports:
+      - 8081:8081
+  microservice:
+      image: java:8-jre
+      restart: always
+      hostname: km4city
+      depends_on:
+        - kafka1
+        - elasticsearch
+      command: "bash -c 'echo Waiting Kafka and ES  && \
+                             sleep 1 && \
+                             cd /opt/microservice/ && \
+                             /usr/bin/java -jar /opt/microservice/km4city-1.0-SNAPSHOT.jar -cp /opt/microservice/lib/*'"
+      volumes:
+          - ./target/:/opt/microservice/
+      ports:
+        - "8080:8080"
