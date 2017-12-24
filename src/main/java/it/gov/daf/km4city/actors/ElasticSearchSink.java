@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.time.LocalDate;
 import java.util.Properties;
 
 /**
@@ -70,13 +71,13 @@ public class ElasticSearchSink extends AbstractActor {
 
     private void process(Event event) {
         try {
-            final String json = event.getBody().toString();
+            final String json =  new String(event.getBody().array(), "UTF-8");
             final String mapping = event.getSource().toString();
-            final String index = "iot_"+mapping;
+            final String index = "iot."+ LocalDate.now();
 
             //put in elastic
-            logger.info("indexing mapping {}, source {}", json, mapping);
-            IndexResponse response = client.prepareIndex(index+"_"+mapping, mapping)
+            logger.info("indexing mapping {}, source {}", mapping, json);
+            IndexResponse response = client.prepareIndex(index, mapping)
                     .setSource(json)
                     .get();
 
@@ -102,6 +103,7 @@ public class ElasticSearchSink extends AbstractActor {
                 .match(Event.class, event -> {
                     try {
                         logger.info("indexing event {}", event);
+                        process(event);
                         ok++;
                     } catch (Exception e) {
                         logger.error("error", e);

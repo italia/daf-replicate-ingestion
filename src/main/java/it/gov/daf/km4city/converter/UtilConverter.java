@@ -21,8 +21,8 @@ public class UtilConverter {
         output.setBody(ByteBuffer.wrap(item.toJSONString().getBytes()));
         output.setAttributes(new HashMap());
 
-        output.setSource("SENSOR");
-        output.setId("SENSOR"+timestamp);
+        output.setSource("sensor");
+        output.setId("iot.id."+timestamp);
         output.setHost("host");
         output.setLocation("location");
         output.setService("type");

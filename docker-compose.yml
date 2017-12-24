@@ -67,7 +67,7 @@ services:
         - kafka1
         - elasticsearch
       command: "bash -c 'echo Waiting Kafka and ES  && \
-                             sleep 1 && \
+                             sleep 10 && \
                              cd /opt/microservice/ && \
                              /usr/bin/java -jar /opt/microservice/km4city-1.0-SNAPSHOT.jar -cp /opt/microservice/lib/*'"
       volumes:

@@ -6,7 +6,26 @@ A first version of this microservice was developed during the hackaton https://h
 
 After the competion, for fun, i refactored the project structure introducing Akka actors and Akka Http.
 
-The service can started and resumed with the rest call:
+
+## Installation
+
+I provide a simple docker-compose file for starting the microservice and a local kafka and elasticsearch cluster.
+
+To run you have to compile the project using maven:
+
+```bash
+mvn clean package
+```
+
+and then simpy:
+
+```bash
+docker-compose up -d
+```
+
+## Controlling the microservice with rest API
+
+The service can be paused and resumed with the rest call:
 
 ```bash
 curl -XGET http://localhost:8080/pause
